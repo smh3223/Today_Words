@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TodayWords</title>
+    <style>
+      body {
+        font-family: "Noto Sans KR", system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f9fafb;
+        color: #111827;
+      }
+      header {
+        background: #2563eb;
+        color: white;
+        padding: 1rem 2rem;
+      }
+      main {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      }
+      h1 {
+        margin: 0;
+      }
+      h2 {
+        margin: 0.3rem 0;
+      }
+      ul {
+        padding-left: 1.2rem;
+      }
+      .examples li {
+        margin-bottom: 0.35rem;
+      }
+      .muted {
+        color: #6b7280;
+        font-size: 0.95rem;
+      }
+      .error {
+        color: #b91c1c;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>TodayWords</h1>
+      <p class="muted">익숙한 한국어 어휘를 오늘 더 적극적으로 써 보세요.</p>
+    </header>
+    <main>
+      <div class="card" id="word-card">
+        <p>오늘의 단어를 불러오는 중입니다...</p>
+      </div>
+    </main>
+    <script>
+      async function loadTodayWord() {
+        const card = document.getElementById("word-card");
+        try {
+          const response = await fetch("http://localhost:8000/words/today");
+          if (!response.ok) throw new Error("백엔드 연결에 실패했습니다.");
+          const data = await response.json();
+          card.innerHTML = `
+            <div class="muted">오늘의 단어</div>
+            <h2>${data.word}</h2>
+            <p><strong>의미</strong>: ${data.meaning}</p>
+            <p><strong>뉘앙스</strong>: ${data.nuance}</p>
+            <div>
+              <strong>예문</strong>
+              <ul class="examples">
+                ${data.examples.map((ex) => `<li>${ex}</li>`).join("")}
+              </ul>
+            </div>
+            <div>
+              <strong>비슷한 표현</strong>: ${data.similar_words.join(", ")}
+            </div>
+          `;
+        } catch (error) {
+          card.innerHTML = `<p class="error">${error.message}</p>`;
+        }
+      }
+
+      loadTodayWord();
+    </script>
+  </body>
+</html>
